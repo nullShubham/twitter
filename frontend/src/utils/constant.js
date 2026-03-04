@@ -1,5 +1,6 @@
-export const USER_API_END_POINT = "http://localhost:8080/api/v1/user";
-export const TWEET_API_END_POINT = "http://localhost:8080/api/v1/tweet";
+const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080";
+export const USER_API_END_POINT = `${API_BASE}/api/v1/user`;
+export const TWEET_API_END_POINT = `${API_BASE}/api/v1/tweet`;
 
 export const timeSince = (timestamp) => {
     let time = Date.parse(timestamp);
