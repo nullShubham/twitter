@@ -6,7 +6,7 @@ import {useSelector} from "react-redux";
 const Feed = () => {
   const {tweets} = useSelector(store=>store.tweet);
   return (
-    <div className='w-[50%] border border-gray-200'>
+    <div className='w-[50%] bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_8px_32px_0_rgba(255,255,255,0.05)] overflow-hidden'>
       <div>
         <CreatePost/>
         {

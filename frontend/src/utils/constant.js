@@ -1,4 +1,4 @@
-const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080";
+const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:3001";
 export const USER_API_END_POINT = `${API_BASE}/api/v1/user`;
 export const TWEET_API_END_POINT = `${API_BASE}/api/v1/tweet`;
 

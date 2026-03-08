@@ -17,5 +17,17 @@ const tweetSchema = new mongoose.Schema({
         type:Array,
         default:[]
     },
+    comments:{
+        type:[
+            {
+                userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+                name: String,
+                username: String,
+                comment: String,
+                createdAt: { type: Date, default: Date.now }
+            }
+        ],
+        default:[]
+    }
 },{timestamps:true});
 export const Tweet = mongoose.model("Tweet", tweetSchema);

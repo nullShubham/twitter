@@ -4,9 +4,9 @@ import { User } from "../models/userSchema.js";
 export const createTweet = async (req, res) => {
     try {
         const { description, id } = req.body;
-        if (!description || !id) {
+        if (!id) {
             return res.status(401).json({
-                message: "Fields are required.",
+                message: "User id is required.",
                 success: false
             });
         };
@@ -89,4 +89,72 @@ export const getFollowingTweets = async (req,res) =>{
         console.log(error);
     }
 }
- 
+
+export const getAllExploreTweets = async (req,res) => {
+    try {
+        const allTweets = await Tweet.find().sort({ createdAt: -1 });
+        return res.status(200).json({
+            tweets: allTweets
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const addComment = async (req, res) => {
+    try {
+        const tweetId = req.params.id;
+        const { userId, comment } = req.body;
+
+        if (!userId || !comment) {
+            return res.status(400).json({ message: "UserId and comment text are required." });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        const tweet = await Tweet.findByIdAndUpdate(
+            tweetId,
+            {
+                $push: {
+                    comments: {
+                        userId: user._id,
+                        name: user.name,
+                        username: user.username,
+                        comment: comment
+                    }
+                }
+            },
+            { new: true }
+        );
+
+        if (!tweet) {
+            return res.status(404).json({ message: "Tweet not found." });
+        }
+
+        return res.status(200).json({
+            message: "Comment added successfully.",
+            tweet: tweet,
+            success: true
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server error." });
+    }
+}
+
+export const getUserTweets = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const tweets = await Tweet.find({ userId: id }).sort({ createdAt: -1 });
+        return res.status(200).json({
+            tweets: tweets
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server error." });
+    }
+}

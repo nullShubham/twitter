@@ -28,10 +28,18 @@ const userSlice = createSlice({
                 // follow
                 state.user.following.push(action.payload);
             }
+        },
+        bookmarkUpdate:(state,action)=>{
+            if(!state.user.bookmarks) state.user.bookmarks = [];
+            if(state.user.bookmarks.includes(action.payload)){
+                state.user.bookmarks = state.user.bookmarks.filter((id)=> id !== action.payload);
+            }else{
+                state.user.bookmarks.push(action.payload);
+            }
         }
     }
 });
-export const {getUser, getOtherUsers,getMyProfile,followingUpdate} = userSlice.actions;
+export const {getUser, getOtherUsers,getMyProfile,followingUpdate, bookmarkUpdate} = userSlice.actions;
 export default userSlice.reducer;
 
 

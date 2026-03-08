@@ -1,6 +1,44 @@
 import { User } from "../models/userSchema.js";
+import { Tweet } from "../models/tweetSchema.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+
+export const updateProfile = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { name, bio, location } = req.body;
+
+        // Basic validation - ensure name at least exists if they are updating it, 
+        // though typically you'd allow partial updates. We'll allow partials.
+        
+        const updateData = {};
+        if (name) updateData.name = name;
+        if (bio !== undefined) updateData.bio = bio; 
+        if (location !== undefined) updateData.location = location;
+
+        const user = await User.findByIdAndUpdate(id, updateData, { new: true }).select("-password");
+        
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found.",
+                success: false
+            });
+        }
+
+        return res.status(200).json({
+            message: "Profile updated successfully.",
+            user,
+            success: true
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Internal server error.",
+            success: false
+        });
+    }
+}
 
 export const Register = async (req, res) => {
     try {
@@ -34,6 +72,10 @@ export const Register = async (req, res) => {
 
     } catch (error) {
         console.log(error);
+        return res.status(500).json({
+            message: "Internal server error.",
+            success: false
+        });
     }
 }
 export const Login = async (req, res) => {
@@ -55,7 +97,7 @@ export const Login = async (req, res) => {
         const isMatch = await bcryptjs.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({
-                message: "Incorect email or password",
+                message: "Incorrect email or password",
                 success: false
             });
         }
@@ -70,6 +112,10 @@ export const Login = async (req, res) => {
         })
     } catch (error) {
         console.log(error);
+        return res.status(500).json({
+            message: "Internal server error.",
+            success: false
+        });
     }
 }
 export const logout = (req, res) => {
@@ -101,6 +147,32 @@ export const bookmark = async (req, res) => {
         console.log(error);
     }
 };
+
+export const getBookmarks = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        
+        // Find tweets where the ID is in the user's bookmarks array
+        const bookmarkedTweets = await Promise.all(user.bookmarks.map((tweetId) => {
+            return Tweet.findById(tweetId);
+        }));
+
+        // Filter out nulls in case a bookmarked tweet was deleted
+        const validTweets = bookmarkedTweets.filter(tweet => tweet !== null);
+
+        return res.status(200).json({
+            tweets: validTweets
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Error fetching bookmarks" });
+    }
+};
+
 export const getMyProfile = async (req, res) => {
     try {
         const id = req.params.id;
@@ -172,5 +244,32 @@ export const unfollow = async (req,res) => {
         })
     } catch (error) {
         console.log(error);
+    }
+}
+
+export const getConnections = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const followersList = await Promise.all(user.followers.map((followerId) => {
+            return User.findById(followerId).select("-password -bookmarks");
+        }));
+
+        const followingList = await Promise.all(user.following.map((followingId) => {
+            return User.findById(followingId).select("-password -bookmarks");
+        }));
+
+        return res.status(200).json({
+            followers: followersList.filter(u => u !== null),
+            following: followingList.filter(u => u !== null)
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Error fetching connections" });
     }
 }

@@ -22,7 +22,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 const corsOptions = {
-    origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+    origin: process.env.CORS_ORIGIN 
+        ? process.env.CORS_ORIGIN 
+        : ["https://twitter-beta-gold.vercel.app", "http://localhost:3000"],
     credentials: true,
 };
 app.use(cors(corsOptions));
@@ -34,13 +36,16 @@ app.use(async (req, res, next) => {
 });
 
 // api
+app.get("/health", (req, res) => {
+    res.json({ message: "API is working" });
+});
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/tweet", tweetRoute);
 
 // only listen when not on Vercel
 if (process.env.VERCEL !== "1") {
-    app.listen(process.env.PORT || 8080, () => {
-        console.log(`Server listen at port ${process.env.PORT || 8080}`);
+    app.listen(process.env.PORT, () => {
+        console.log(`Server listen at port ${process.env.PORT}`);
     });
 }
 

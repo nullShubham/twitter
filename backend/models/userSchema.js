@@ -30,6 +30,14 @@ const userSchema = new mongoose.Schema({
     bookmarks:{
         type:Array,
         default:[]
+    },
+    bio:{
+        type:String,
+        default:""
+    },
+    location:{
+        type:String,
+        default:""
     }
 },{timestamps:true});
 export const User = mongoose.model("User", userSchema);

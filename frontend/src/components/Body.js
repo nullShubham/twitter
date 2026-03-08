@@ -4,6 +4,9 @@ import Login from './Login';
 import Home from './Home';
 import Feed from './Feed';
 import Profile from './Profile';
+import Explore from './Explore';
+import Notifications from './Notifications';
+import Bookmarks from './Bookmarks';
 
 const Body = () => {
     const appRouter = createBrowserRouter([
@@ -18,6 +21,18 @@ const Body = () => {
                 {
                     path:"/profile/:id",
                     element:<Profile/>
+                },
+                {
+                    path:"/explore",
+                    element:<Explore/>
+                },
+                {
+                    path:"/notifications",
+                    element:<Notifications/>
+                },
+                {
+                    path:"/bookmarks",
+                    element:<Bookmarks/>
                 }
             ]
         },
